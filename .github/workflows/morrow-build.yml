@@ -1,5 +1,8 @@
-﻿name: Morrow build
-on: [push, workflow_dispatch]
+name: Morrow build
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -39,6 +42,18 @@ jobs:
 
       - name: Package
         run: python tools/package_morrow.py --output dist/morrow
+
+      - name: Publish to build-output branch
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan build-output
+          git rm -rf . --quiet
+          Copy-Item dist\*.zip . -Force
+          git add *.zip
+          git commit -m "Build $env:GITHUB_SHA"
+          git push --force origin build-output
 
       - uses: actions/upload-artifact@v4
         with:
