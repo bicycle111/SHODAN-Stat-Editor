@@ -21266,6 +21266,113 @@ end
 
 -- Adds a damage row's stats (the first `count`, default all) to `entry`, ids `prefix` .. stat id.
 -- `what` names the damage / durable rows ('Explosion' -> 'Explosion damage'); `strike`: steps of 10 / 100 for those.
+local DAMAGE_FALLBACK = {
+    ["006E44327BB953FE"] = 40,
+    ["027DEC442CC26A90"] = 81,
+    ["02CD7321CD8445F5"] = 235,
+    ["02EECD0B1FA49630"] = 39,
+    ["03E67A19B07C6523"] = 150,
+    ["05D8D8C073B9D502"] = 64,
+    ["0807AEA5217E4767"] = 98,
+    ["0B882808C6F498E8"] = 74,
+    ["0E977C49DB7604F9"] = 213,
+    ["0F83639AB8C86165"] = 147,
+    ["11C27D3BABB38956"] = 133,
+    ["14D5D4506056C7A4"] = 103,
+    ["186EA95DE7306B1A"] = 85,
+    ["1A437158E1B8D2A1"] = 99,
+    ["1ABBFF60D26BA391"] = 522,
+    ["1D5943301A29C940"] = 39,
+    ["2152D5147B0AC418"] = 214,
+    ["25AA2FD4643CF4EE"] = 255,
+    ["26E40437EA275296"] = 390,
+    ["295BEB26DC4F8FF1"] = 55,
+    ["299C0D3DFD2F0994"] = 39,
+    ["2B11C9E4980EC479"] = 236,
+    ["2E9D0BDC48B09E60"] = 71,
+    ["30061F91AF477F5E"] = 318,
+    ["35A61296619CC47E"] = 393,
+    ["37079568DC86E9C6"] = 242,
+    ["37CDE43876BA26BB"] = 133,
+    ["3828E2051AA9E897"] = 72,
+    ["416D053372C4E433"] = 61,
+    ["41F2DEF484634B59"] = 146,
+    ["43A58CB89CFA197C"] = 135,
+    ["43CB1033961A2276"] = 113,
+    ["46183B50961D1328"] = 188,
+    ["4BA41B6F9F405CC2"] = 83,
+    ["4C786785C79D44E7"] = 152,
+    ["4D58C77087B774C5"] = 101,
+    ["4DBD74F49C8FFC13"] = 144,
+    ["4E4A613EB9BF5C24"] = 91,
+    ["51A0812E3BCE2D74"] = 39,
+    ["52E4334E6A128CAF"] = 235,
+    ["54D86057F5DACFB9"] = 226,
+    ["587878FB76F4B9B1"] = 133,
+    ["5990123D142B16CB"] = 247,
+    ["5C54E81A4AAA31FC"] = 237,
+    ["5EBAEA70C0D060B9"] = 187,
+    ["5FECAB819F96A3E8"] = 142,
+    ["708EA298C82093D0"] = 122,
+    ["73D84EAAE8C75342"] = 394,
+    ["7617642765AC38C7"] = 466,
+    ["80932FA0ED6901D3"] = 237,
+    ["80F1A156D9FA1E36"] = 162,
+    ["84354339522C932D"] = 126,
+    ["8645F167B3C813A2"] = 55,
+    ["88C2D09AD85A7C9F"] = 37,
+    ["89C5493E08CA4207"] = 215,
+    ["8A307BD1811A5FE9"] = 105,
+    ["90DDC374F4E3D756"] = 166,
+    ["94BD931B5FB4EE95"] = 104,
+    ["9571CA51F0DAF35B"] = 82,
+    ["968211C0033DCE64"] = 116,
+    ["9EB160830321BFD6"] = 34,
+    ["9F80D67A12A7E40F"] = 238,
+    ["A6A735ACCB4A327F"] = 116,
+    ["A7EE1EBF58FCDF1F"] = 116,
+    ["A8A91EB54892B6B2"] = 141,
+    ["A8CFFB316F0B5C5F"] = 223,
+    ["A955C4EA6F6D4203"] = 140,
+    ["AA69A60D74A3EC54"] = 63,
+    ["B16C9D490AA59B77"] = 125,
+    ["B2053A1838092F8B"] = 39,
+    ["B2B5E0D185605F9E"] = 284,
+    ["B43235DBD493750C"] = 116,
+    ["B6AFF2195568767F"] = 158,
+    ["B80951732A5F58F4"] = 116,
+    ["B814EECE17533BC4"] = 217,
+    ["B9606C5AAB32C3C2"] = 116,
+    ["B9C209B4F99B5335"] = 170,
+    ["BC29613666DF696B"] = 124,
+    ["BE70EE0D8D44028E"] = 78,
+    ["C12A34F375BD5A87"] = 191,
+    ["C780BCD79547DA0F"] = 100,
+    ["C85F576D5E086147"] = 56,
+    ["CA4BBEF63C869C18"] = 91,
+    ["CC786F6491FE7E65"] = 254,
+    ["CD00BDC1149C2928"] = 214,
+    ["CDF28BE026BB7D84"] = 116,
+    ["CE063AA33D95A812"] = 143,
+    ["CF5F176E0E322BE1"] = 115,
+    ["CF8934FF6567A42D"] = 102,
+    ["D53EE03481AE73FD"] = 116,
+    ["DBB6C961C59FADC1"] = 165,
+    ["DCD1C835407EF7BA"] = 167,
+    ["E5796355A8FD67E0"] = 151,
+    ["E5F64DCC3BFE9DD1"] = 225,
+    ["E6D932BE83729076"] = 148,
+    ["E8D5F49AD7780E54"] = 65,
+    ["E91F569C2AD8AF01"] = 75,
+    ["EEA5E3CEF1E12C14"] = 63,
+    ["EF85D6CF58E31D70"] = 133,
+    ["F0338468DCDB6A6C"] = 138,
+    ["F49227A0630A3F7F"] = 218,
+    ["F992CE97577C8A7F"] = 84,
+    ["FB3A19078694708A"] = 70,
+    ["FE3B29B2CFA63F9B"] = 39,
+}
+
 local function damage_rows(entry, section, prefix, drow, what, count, strike)
     local first
     for k = 1, count or 9 do
@@ -21529,6 +21636,24 @@ function MOD._migration_resolve_gun(weapon, key)
         arow = kind and tables[TYPES.arc] and tables[TYPES.arc].index[kind]
         local id = arow and read_field(field_at(TYPES.arc, arow + 36, 'u32', 100000))
         drow = id and tables[T_DAMAGE] and tables[T_DAMAGE].index[id]
+    end
+    if weapon.hash == 'B814EECE17533BC4' then
+        log('AMW resolve name=' .. tostring(weapon.name) .. ' key=' .. tostring(weapon.key) .. ' drow=' .. tostring(drow))
+        local dt = tables[T_DAMAGE]
+        if dt then
+            local cand = {}
+            for id, off in pairs(dt.index) do
+                local d = default_of(field_at(T_DAMAGE, off + 4, 'u32', 1000000))
+                local du = default_of(field_at(T_DAMAGE, off + 8, 'u32', 1000000))
+                if d == 1600 or du == 1600 then cand[#cand + 1] = tostring(id) .. ':' .. tostring(d) .. ':' .. tostring(du) end
+                if not drow and d == 1600 and du == 1600 then drow = off end
+            end
+            log('AMW damage candidates ' .. table.concat(cand, ';'))
+        end
+    end
+    if not drow then
+        local fid = DAMAGE_FALLBACK[weapon.hash]
+        drow = fid and tables[T_DAMAGE] and tables[T_DAMAGE].index[fid]
     end
     weapon.projectile, weapon.damage_row = prow and projectile or nil, nil
     local main_from = #weapon.rows + 1   -- the shot's rows (direct hit, projectile, explosions): main_from..main_to
@@ -25191,7 +25316,12 @@ local function resolve(weapon)
                                 { part('shield_plate_armor', TYPES.health, at + 520 + 552 + 216, 'u32', 100) }, 0, 10, 1, 1)
                     end
                     -- the bash is an ability, no record of the arm names its damage: row 251 (unnamed), the only one with the wiki's 9 values
-                    MOD.melee_rows(weapon, 251, 'Shield bash', 'bash_')
+                    local _sdt = tables[T_DAMAGE]
+                    if _sdt and _sdt.index[251] then
+                        damage_rows(weapon, 'Damage', 'shield_bash_', _sdt.index[251], 'Shield bash', 9, true,
+                            { '盾击伤害', '盾击耐伤伤害', '盾击穿甲（直射）', '盾击穿甲（小角度）',
+                              '盾击穿甲（大角度）', '盾击穿甲（极大角度）', '盾击拆除力', '盾击硬直', '盾击推力' })
+                    end
                 end
             end
         end
@@ -34422,16 +34552,43 @@ if MOD.offline then
         ui.tab=tab;ui.search.text=query or ''
         local out={}
         for _,w in ipairs(weapons_in(query and query~='' and '?search' or tab)) do
+            if not (tab=='Armors' and w.player) then
             state.desktop.registry[w.hash]=w
             out[#out+1]={id=w.hash,name=MOD.desktop_name(w),english=w.name,groups=MOD.desktop_groups(w),note=settings.tr(w.note or ''),english_note=w.note or '',changed=modified(w)}
+            end
         end
         return out
     end
     function state.desktop.select(hash)
         local w=state.desktop.registry[hash] or by_hash[hash]
-        assert(w,'找不到此数据记录');select_weapon(w);return true
+        assert(w,'找不到此数据记录');select_weapon(w)
+        if hash=='B814EECE17533BC4' and not w.damage_row then
+            local dt=tables[T_DAMAGE]
+            local drow=dt and dt.index[217]
+            if not drow and dt then
+                for id,off in pairs(dt.index) do
+                    local d=default_of(field_at(T_DAMAGE,off+4,'u32',1000000))
+                    local du=default_of(field_at(T_DAMAGE,off+8,'u32',1000000))
+                    if d==1600 and du==1600 then drow=off;break end
+                end
+            end
+            if drow then w.damage_row=true;damage_rows(w,'Damage','',drow) end
+        end
+        return true
     end
     function state.desktop.rows(requested)
+        if ui.weapon and ui.weapon.hash=='B814EECE17533BC4' and not ui.weapon.damage_row then
+            local dt=tables[T_DAMAGE]
+            local drow=dt and dt.index[217]
+            if not drow and dt then
+                for id,off in pairs(dt.index) do
+                    local d=default_of(field_at(T_DAMAGE,off+4,'u32',1000000))
+                    local du=default_of(field_at(T_DAMAGE,off+8,'u32',1000000))
+                    if d==1600 and du==1600 then drow=off;break end
+                end
+            end
+            if drow then ui.weapon.damage_row=true;damage_rows(ui.weapon,'Damage','',drow) end
+        end
         if ui.weapon and ui.weapon.stratagem and ui.weapon.stratagem.drone then resolve(ui.weapon) end
         local out={}
         local impact=require('desktop_features');local index=impact.shared_index(by_hash)

@@ -14,6 +14,7 @@ import 'desktop_frame.dart';
 import 'armor_page.dart';
 import 'armor_item.dart';
 import 'game_text.dart';
+import 'game_params_page.dart';
 import 'preset_page.dart';
 import 'review_body.dart';
 
@@ -53,6 +54,7 @@ class _WorkbenchState extends State<Workbench> {
     'Armor': '被动组合',
     'Armors': '护甲、头盔与披风',
     'Presets': '全局预设',
+    'GameParams': '游戏参数',
     'Settings': '设置',
     'Primary': '主武器',
     'Secondary': '副武器',
@@ -78,6 +80,7 @@ class _WorkbenchState extends State<Workbench> {
     'Helldiver': ('潜兵', Icons.person_outline),
     'Terminids': ('敌人', Icons.pest_control_outlined),
     'Records': ('数据与预设', Icons.storage_outlined),
+    'GameParams': ('游戏参数', Icons.tune_outlined),
     'Settings': ('设置', Icons.tune),
   };
   List<String> peers(String key) {
@@ -127,7 +130,7 @@ class _WorkbenchState extends State<Workbench> {
       busy = true;
     });
     try {
-      if (['Armor', 'Presets', 'Settings'].contains(key)) {
+      if (['Armor', 'Presets', 'GameParams', 'Settings'].contains(key)) {
         setState(() => busy = false);
         return;
       }
@@ -1212,6 +1215,12 @@ class _WorkbenchState extends State<Workbench> {
                                   ),
                                   child: tab == 'Settings'
                                       ? settingsPage()
+                                      : tab == 'GameParams'
+                                      ? GameParamsPage(
+                                          backend: backend,
+                                          onError: showError,
+                                          surface: (child) => surface(child),
+                                        )
                                       : tab == 'Armor'
                                       ? ArmorPage(
                                           backend: backend,

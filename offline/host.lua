@@ -585,7 +585,11 @@ local function main()
             end)end
             return result
         end
-        B.armor_profile=function(id) return AR.group(id) end
+        B.armor_profile=function(id)
+            local p=AR.group(id); local e={}
+            for k,v in pairs(p.enabled or {}) do e[tostring(k)]=v end
+            return {enabled=e,own=p.own,conflicts=p.conflicts,configured=p.configured}
+        end
         B.armor_update=function(target,id,enabled,own,policy)
             local p=AR.group(target)
             local old={enabled={},own=p.own,conflicts=p.conflicts,configured=p.configured}

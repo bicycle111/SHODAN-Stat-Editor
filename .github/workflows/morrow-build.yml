@@ -1,0 +1,47 @@
+﻿name: Morrow build
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Get runtime
+        shell: pwsh
+        run: |
+          $url = "https://github.com/127MU/SHODAN-Stat-Editor/releases/download/v4.5.1-r1/SHODAN_4.5.1-r1_Windows.zip"
+          Invoke-WebRequest $url -OutFile runtime.zip
+          Expand-Archive runtime.zip -DestinationPath runtime
+          $dir = Get-ChildItem runtime -Directory | Select-Object -First 1
+          New-Item -ItemType Directory -Force offline\runtime | Out-Null
+          Copy-Item "$($dir.FullName)\lua51.dll" offline\runtime\
+          Copy-Item "$($dir.FullName)\libsodium.dll" offline\runtime\
+          New-Item -ItemType Directory -Force offline\launcher | Out-Null
+          Copy-Item "$($dir.FullName)\shodan_hash.dll" offline\launcher\
+
+      - name: Build host
+        run: cargo build --release --workspace
+
+      - name: Build UI
+        working-directory: desktop/morrow
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter build windows --release
+
+      - name: Package
+        run: python tools/package_morrow.py --output dist/morrow
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SHODAN-Morrow
+          path: dist/*.zip
+

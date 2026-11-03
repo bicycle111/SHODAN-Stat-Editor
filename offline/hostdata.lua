@@ -903,8 +903,34 @@ function M.import_forge_values(text)
     return #plan
 end
 
+
+
+-- SHODAN custom: FRV tire immortal (config file; default on)
+local TIRE_IMMORTAL_OFF = {
+    10106748, 10107300, 10107852, 10108404,
+    17442620, 17443172, 17443724, 17444276,
+    17464716, 17465268, 17465820, 17466372,
+    17486812, 17487364, 17487916, 17488468
+}
+local function tire_value()
+    local dir = os.getenv('LOCALAPPDATA')
+    if not dir then return 1 end
+    local f = io.open(dir .. '\\SHODAN\\StatEditor\\tire_immortal.txt', 'r')
+    if not f then return 1 end
+    local v = tonumber((f:read('*l') or ''):match('^%s*(.-)%s*$'))
+    f:close()
+    if v == nil then return 1 end
+    return v >= 0.5 and 1 or 0
+end
+local function tire_immortal(change)
+    if change.name ~= 'generated_entities.dl_bin' then return end
+    local byte = tire_value()
+    for _, at in ipairs(TIRE_IMMORTAL_OFF) do change.plain[at] = byte end
+end
+
 function M.build(change, log)
     log = log or function() end
+    tire_immortal(change)
     -- a one-table file whose changes hold no float to vary (whole numbers, zeros): nothing in it may vary for the
     -- hash correction, so its table grows by 16 zero bytes after everything it holds (the game reads only what
     -- its offsets name; grown tables load, as stacked passives do), and those vary instead
