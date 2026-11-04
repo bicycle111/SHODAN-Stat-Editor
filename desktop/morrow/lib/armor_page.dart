@@ -1,7 +1,18 @@
+import 'dart:io';
 import 'glass_theme.dart';
 import 'package:flutter/material.dart';
 import 'number_display.dart';
 import 'backend.dart';
+
+void _armorLog(String text) {
+  try {
+    final root = Platform.environment['LOCALAPPDATA'];
+    if (root == null) return;
+    final f = File('$root\\SHODAN\\StatEditor\\Logs\\armor_debug.log');
+    f.writeAsStringSync('${DateTime.now().toIso8601String()} $text\n',
+        mode: FileMode.append, flush: true);
+  } catch (_) {}
+}
 
 class ArmorPage extends StatefulWidget {
   const ArmorPage({
@@ -75,6 +86,7 @@ class _ArmorPageState extends State<ArmorPage> {
   Future<void> values(Map passive) async {
     try {
       final result = await widget.backend.call('armor_rows', [passive['id']]);
+      _armorLog('armor_rows ${passive['id']} -> $result');
       if (!mounted) return;
       final rows = result is List ? result : [];
       await showDialog<void>(
@@ -90,11 +102,21 @@ class _ArmorPageState extends State<ArmorPage> {
                   ArmorValue(
                     key: ValueKey(row['key']),
                     row: row,
-                    save: (value) => widget.backend.call('armor_set', [
-                      passive['id'],
-                      row['key'],
-                      value,
-                    ]),
+                    save: (value) async {
+                      _armorLog('armor_set ${passive['id']} ${row['key']} $value');
+                      try {
+                        final r = await widget.backend.call('armor_set', [
+                          passive['id'],
+                          row['key'],
+                          value,
+                        ]);
+                        _armorLog('armor_set result $r');
+                        return r;
+                      } catch (e) {
+                        _armorLog('armor_set error $e');
+                        rethrow;
+                      }
+                    },
                     onError: widget.onError,
                   ),
               ],
@@ -245,6 +267,7 @@ class _ArmorValueState extends State<ArmorValue> {
       return;
     }
     if (c.text == saved) return;
+    _armorLog('commit ${widget.row['key']} text=${c.text} saved=$saved');
     busy = true;
     do {
       queued = false;
