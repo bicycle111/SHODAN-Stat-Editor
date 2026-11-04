@@ -284,9 +284,12 @@ class _ArmorValueState extends State<ArmorValue> {
               child: TextField(
                 controller: c,
                 focusNode: focus,
-                onChanged: (_) => commit(),
                 onSubmitted: (_) => commit(),
               ),
+            ),
+            TextButton(
+              onPressed: commit,
+              child: const Text('保存'),
             ),
             TextButton(
               onPressed: () async {
