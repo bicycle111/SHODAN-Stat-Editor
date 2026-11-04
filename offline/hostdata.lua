@@ -834,12 +834,23 @@ do
         end
         local rows=read_values(file.p,file.n,true)[id] or {}
         local allowed=editable[id] or {}
+        local simple={}
+        local armory=require('armory_data')
+        for _, passive in ipairs(armory.list) do
+            if passive.id==id then
+                for _, e in ipairs(passive.effects or {}) do simple[e.a]=e.key end
+                break
+            end
+        end
         local filtered,linked={},{}
         for _, row in ipairs(rows) do
             local identity,ordinal=row.key:match('^%d+:(%d+:%d+:%d+):(%d+)$')
             -- Stacked copies and unrelated modifiers are not additional editable fields.
             if allowed[identity] and ordinal=='1' then
-                row.default=defaults[row.key];row.label=allowed[identity]
+                local raw_key=row.key
+                local effect=tonumber(identity:match('^%d+:(%d+):'))
+                row.default=defaults[raw_key];row.label=allowed[identity]
+                row.simple=simple[effect] or raw_key
                 local group=groups[id] and groups[id][identity]
                 if group and linked[group.name] then
                     local target=linked[group.name];target.ats[#target.ats+1]=row.at

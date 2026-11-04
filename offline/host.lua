@@ -573,10 +573,15 @@ local function main()
         ARM.load_values()
         local B=state.desktop
         B.game=game;B.armor_list=AR.list;B.armor_groups=AR.groups
-        B.armor_rows=D.armor_values
+        B.armor_rows=function(pid) ARM.load_values(); return D.armor_values(pid) end
         require('armor_presets').attach(B,D,ARM,AR)
         B.armor_set=function(pid,key,value)
             local old;for _,r in ipairs(D.armor_values(pid))do if r.key==key then old=r.value;break end end
+            if old==nil then
+                for _,r in ipairs(D.armor_values(pid))do
+                    if r.simple==key then key=r.key;old=r.value;break end
+                end
+            end
             assert(old~=nil,'找不到护甲参数')
             local result,why=ARM.set_value(pid,key,value);assert(result~=nil,why)
             if result~=old then B._record_edit('护甲被动 #'..pid..' · '..key,old,result,function(target,expected)
