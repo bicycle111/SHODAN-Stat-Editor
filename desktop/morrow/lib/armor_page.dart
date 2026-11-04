@@ -311,7 +311,22 @@ class _ArmorValueState extends State<ArmorValue> {
               ),
             ),
             TextButton(
-              onPressed: commit,
+              onPressed: () async {
+                _armorLog('save button text=${c.text}');
+                final value = double.tryParse(c.text);
+                if (value == null || !value.isFinite) {
+                  widget.onError(StateError('请输入有效数值'));
+                  return;
+                }
+                try {
+                  await widget.save(value);
+                  saved = c.text;
+                  _armorLog('save button ok');
+                } catch (e) {
+                  _armorLog('save button error $e');
+                  widget.onError(e);
+                }
+              },
               child: const Text('保存'),
             ),
             TextButton(
