@@ -21,7 +21,7 @@ pub(crate) fn needs_reapply(workspace: &Workspace) -> bool {
 }
 pub(crate) const BASELINE: &[u8] = include_bytes!("../data/armor-baseline.bin");
 
-#[derive(Default, Deserialize, Serialize)]
+#[derive(Default, Deserialize, Serialize, Clone)]
 pub(crate) struct State {
     numeric: Option<String>,
     profiles: String,
@@ -360,6 +360,15 @@ pub(crate) fn invoke(
             }
             armor.set(key, crate::desktop::number(arg(2))?)?;
             settings.numeric = Some(armor.capture()?);
+            // Persist the edit immediately and force the next install to rebuild
+            // the armor file instead of returning early on unchanged metadata.
+            let mut metadata = workspace.metadata().clone();
+            store(&mut metadata, settings.clone())?;
+            if !metadata.is_object() {
+                metadata = json!({});
+            }
+            metadata[REAPPLY] = json!(true);
+            workspace.set_batch(&[], Some(metadata))?;
             json!(true)
         }
         "armor_profile" | "armor_update" => {
