@@ -315,7 +315,7 @@ class _InstallDialogState extends State<InstallDialog> {
             !widget.repair &&
             (widget.restore
                 ? message.contains('的文件已变化')
-                : message.contains('已被其他工具修改，已停止写入')))
+                : (message.contains('已被其他工具修改') || message.contains('文件已变化'))))
           OutlinedButton.icon(
             onPressed: forceWrite,
             icon: const Icon(Icons.warning_amber_outlined),
